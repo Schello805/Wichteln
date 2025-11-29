@@ -19,16 +19,6 @@
   --shadow-glow: 0 0 20px var(--primary-glow);
 }
 
-[data-theme="light"] {
-  --bg-color: #f8fafc;
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-border: rgba(0, 0, 0, 0.1);
-  --primary: #dc2626;
-  --primary-glow: rgba(220, 38, 38, 0.3);
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;

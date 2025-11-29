@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Dice from './components/Dice';
 import RuleCard from './components/RuleCard';
 import Timer from './components/Timer';
@@ -8,10 +8,10 @@ import Snow from './components/Snow';
 
 // Default rules for Schrottwichteln (1 Die)
 const DEFAULT_RULES_1_DIE: Record<number, string> = {
-  1: "Tausche mit dem jüngsten Spieler!",
+  1: "Geschenk auspacken! (Oder behalten)",
   2: "Tausche mit dem linken Nachbarn!",
   3: "Tausche mit dem rechten Nachbarn!",
-  4: "Tausche mit dem ältesten Spieler!",
+  4: "Tausche mit einem beliebigen Spieler!",
   5: "Alle geben ihr Geschenk nach links!",
   6: "Joker! Tausche mit wem du willst (oder nicht)."
 };
@@ -23,13 +23,8 @@ function App() {
   const [isRolling, setIsRolling] = useState(false);
   const [showRule, setShowRule] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   const totalValue = diceValues.reduce((a, b) => a + b, 0);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
 
   const handleRoll = () => {
     if (isRolling) return;
@@ -62,8 +57,6 @@ function App() {
           setDiceValues(Array(count).fill(1));
           setShowRule(false);
         }}
-        theme={theme}
-        onToggleTheme={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
       />
 
       <header style={{
@@ -71,7 +64,7 @@ function App() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottom: '1px solid var(--card-border)'
+        borderBottom: '1px solid rgba(255,255,255,0.05)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
@@ -82,7 +75,7 @@ function App() {
           }}>
             <Gift color="white" size={24} />
           </div>
-          <h1 style={{ fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--text-main)' }}>Schrottwichteln</h1>
+          <h1 style={{ fontSize: '1.25rem', letterSpacing: '-0.02em' }}>Schrottwichteln</h1>
         </div>
         <button
           onClick={() => setIsSettingsOpen(true)}
@@ -112,7 +105,7 @@ function App() {
           position: 'relative',
           zIndex: 10,
           display: 'flex',
-          gap: diceCount > 1 ? '4rem' : '0',
+          gap: '2rem',
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
@@ -158,9 +151,12 @@ function App() {
         padding: '1rem',
         color: 'var(--text-muted)',
         fontSize: '0.875rem',
-        borderTop: '1px solid var(--card-border)'
+        borderTop: '1px solid rgba(255,255,255,0.05)'
       }}>
         <p>Viel Spaß beim Wichteln!</p>
+        <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', opacity: 0.7 }}>
+          Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity"
+        </p>
       </footer>
     </div>
   );

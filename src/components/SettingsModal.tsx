@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Save, RotateCcw, Moon, Sun } from 'lucide-react';
+import { X, Save, RotateCcw } from 'lucide-react';
 import './SettingsModal.css';
 
 interface SettingsModalProps {
@@ -9,15 +9,13 @@ interface SettingsModalProps {
     onUpdateRules: (newRules: Record<number, string>) => void;
     diceCount: number;
     onUpdateDiceCount: (count: number) => void;
-    theme: 'dark' | 'light';
-    onToggleTheme: () => void;
 }
 
 const DEFAULT_RULES_1_DIE: Record<number, string> = {
-    1: "Tausche mit dem jüngsten Spieler!",
+    1: "Geschenk auspacken! (Oder behalten)",
     2: "Tausche mit dem linken Nachbarn!",
     3: "Tausche mit dem rechten Nachbarn!",
-    4: "Tausche mit dem ältesten Spieler!",
+    4: "Tausche mit einem beliebigen Spieler!",
     5: "Alle geben ihr Geschenk nach links!",
     6: "Joker! Tausche mit wem du willst (oder nicht)."
 };
@@ -27,11 +25,11 @@ const DEFAULT_RULES_2_DICE: Record<number, string> = {
     3: "Tausche mit dem 3. Spieler zu deiner Linken",
     4: "Alle Geschenke werden neu verteilt",
     5: "Tausche mit einem Spieler deiner Wahl",
-    6: "Tausche mit dem Spieler, der dir gegenüber sitzt",
-    7: "Tausche mit dem Spieler, der am lautesten lacht",
+    6: "Geschenk auspacken",
+    7: "Nichts passiert (Glück gehabt!)",
     8: "Alle geben ihr Geschenk nach links",
     9: "Tausche mit dem 3. Spieler zu deiner Rechten",
-    10: "Du musst ein Weihnachtslied singen (und darfst tauschen)",
+    10: "Du musst ein Weihnachtslied singen",
     11: "Tausche das Geschenk mit dem, der am weitesten weg sitzt",
     12: "Joker! Bestimme eine Regel für diese Runde"
 };
@@ -42,9 +40,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     rules,
     onUpdateRules,
     diceCount,
-    onUpdateDiceCount,
-    theme,
-    onToggleTheme
+    onUpdateDiceCount
 }) => {
     if (!isOpen) return null;
 
@@ -79,7 +75,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
     return (
         <div className="settings-overlay">
-            <div className="glass-panel settings-modal" style={{ background: 'var(--card-bg)' }}>
+            <div className="glass-panel settings-modal">
                 <button
                     onClick={onClose}
                     style={{
@@ -93,35 +89,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <X />
                 </button>
 
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)' }}>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Save size={24} className="text-primary" />
                     Einstellungen
                 </h2>
 
                 <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>Design</label>
-                    <button
-                        onClick={onToggleTheme}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem 1.5rem',
-                            borderRadius: '8px',
-                            background: 'rgba(255,255,255,0.1)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            color: 'var(--text-main)',
-                            width: '100%',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-                        {theme === 'dark' ? 'Dunkler Modus' : 'Heller Modus'}
-                    </button>
-                </div>
-
-                <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>Anzahl Würfel</label>
+                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Anzahl Würfel</label>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                         <button
                             className={diceCount === 1 ? 'btn-primary' : ''}
@@ -131,8 +105,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 background: diceCount === 1 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
                                 border: '1px solid rgba(255,255,255,0.1)',
                                 flex: 1,
-                                justifyContent: 'center',
-                                color: diceCount === 1 ? 'white' : 'var(--text-main)'
+                                justifyContent: 'center'
                             }}
                             onClick={() => handleDiceCountChange(1)}
                         >
@@ -146,8 +119,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                 background: diceCount === 2 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
                                 border: '1px solid rgba(255,255,255,0.1)',
                                 flex: 1,
-                                justifyContent: 'center',
-                                color: diceCount === 2 ? 'white' : 'var(--text-main)'
+                                justifyContent: 'center'
                             }}
                             onClick={() => handleDiceCountChange(2)}
                         >
@@ -158,7 +130,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 <div style={{ marginBottom: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <label style={{ fontWeight: 600, color: 'var(--text-main)' }}>Regeln bearbeiten</label>
+                        <label style={{ fontWeight: 600 }}>Regeln bearbeiten</label>
                         <button
                             onClick={resetRules}
                             style={{
@@ -177,7 +149,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {range.map(num => (
                             <div key={num} className="settings-input-group">
-                                <div className="settings-number-badge" style={{ color: 'var(--text-main)' }}>
+                                <div className="settings-number-badge">
                                     {num}
                                 </div>
                                 <input
@@ -186,11 +158,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     onChange={(e) => handleRuleChange(num, e.target.value)}
                                     placeholder="Keine Aktion"
                                     className="settings-input"
-                                    style={{
-                                        background: theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.2)',
-                                        borderColor: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
-                                        color: 'var(--text-main)'
-                                    }}
                                 />
                             </div>
                         ))}
