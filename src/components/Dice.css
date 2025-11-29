@@ -5,6 +5,14 @@
     margin: 0 auto;
 }
 
+@media (max-width: 600px) {
+    .scene {
+        transform: scale(0.7);
+        margin: -30px auto;
+        /* Compensate for whitespace caused by scaling */
+    }
+}
+
 .cube {
     width: 100%;
     height: 100%;

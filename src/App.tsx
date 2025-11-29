@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
+import { playRollSound, playWinSound } from './utils/audio';
 import Dice from './components/Dice';
 import RuleCard from './components/RuleCard';
 import Timer from './components/Timer';
 import SettingsModal from './components/SettingsModal';
-import { Gift, Settings } from 'lucide-react';
+import { Gift, Settings, Sun, Moon } from 'lucide-react';
 import Snow from './components/Snow';
 
 // Default rules for Schrottwichteln (1 Die)
@@ -16,6 +18,8 @@ const DEFAULT_RULES_1_DIE: Record<number, string> = {
   6: "Joker! Tausche mit wem du willst (oder nicht)."
 };
 
+import './App.css';
+
 function App() {
   const [diceCount, setDiceCount] = useState<number>(1);
   const [rules, setRules] = useState<Record<number, string>>(DEFAULT_RULES_1_DIE);
@@ -23,6 +27,36 @@ function App() {
   const [isRolling, setIsRolling] = useState(false);
   const [showRule, setShowRule] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Theme State
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') as 'dark' | 'light' || 'dark';
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // Sound loop effect
+  useEffect(() => {
+    let interval: any;
+    if (isRolling) {
+      interval = setInterval(() => {
+        playRollSound();
+      }, 100);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRolling]);
 
   const totalValue = diceValues.reduce((a, b) => a + b, 0);
 
@@ -40,6 +74,27 @@ function App() {
   const onRollComplete = () => {
     setIsRolling(false);
     setShowRule(true);
+
+    // Play win sound
+    playWinSound();
+
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+
+    // Check for Joker in rule text
+    const totalValue = diceValues.reduce((a, b) => a + b, 0);
+    const currentRule = rules[totalValue] || "";
+
+    if (currentRule.includes("Joker")) { // Changed from "(Joker)" to "Joker" as per DEFAULT_RULES_1_DIE
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#e11d48', '#f59e0b', '#10b981', '#ffffff']
+      });
+    }
   };
 
   return (
@@ -59,56 +114,35 @@ function App() {
         }}
       />
 
-      <header style={{
-        padding: '1.5rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid rgba(255,255,255,0.05)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{
-            background: 'var(--primary)',
-            padding: '0.5rem',
-            borderRadius: '8px',
-            boxShadow: '0 0 15px var(--primary-glow)'
-          }}>
+      <header className="app-header">
+        <div className="header-logo">
+          <div className="logo-icon">
             <Gift color="white" size={24} />
           </div>
-          <h1 style={{ fontSize: '1.25rem', letterSpacing: '-0.02em' }}>Schrottwichteln</h1>
+          <h1 className="header-title">Wichtelhelfer</h1>
         </div>
-        <button
-          onClick={() => setIsSettingsOpen(true)}
-          style={{
-            background: 'transparent',
-            color: 'var(--text-muted)',
-            padding: '0.5rem',
-            cursor: 'pointer'
-          }}
-        >
-          <Settings size={20} />
-        </button>
+
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={toggleTheme}
+            className="settings-btn"
+            aria-label="Design wechseln"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="settings-btn"
+            aria-label="Einstellungen"
+          >
+            <Settings size={20} />
+          </button>
+        </div>
       </header>
 
-      <main className="container" style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '3rem',
-        paddingTop: '2rem',
-        paddingBottom: '4rem'
-      }}>
-
-        <div style={{
-          position: 'relative',
-          zIndex: 10,
-          display: 'flex',
-          gap: '2rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
+      <main className="container app-main">
+        <div className="dice-container">
           {diceValues.map((val, idx) => (
             <Dice
               key={idx}
@@ -119,15 +153,13 @@ function App() {
           ))}
         </div>
 
-        <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="controls-container">
+          <div className="roll-btn-wrapper">
             <button
-              className="btn-primary"
+              className="btn-primary roll-btn"
               onClick={handleRoll}
               disabled={isRolling}
               style={{
-                fontSize: '1.25rem',
-                padding: '1rem 3rem',
                 opacity: isRolling ? 0.8 : 1,
                 transform: isRolling ? 'scale(0.98)' : 'scale(1)'
               }}
@@ -146,15 +178,9 @@ function App() {
         </div>
       </main>
 
-      <footer style={{
-        textAlign: 'center',
-        padding: '1rem',
-        color: 'var(--text-muted)',
-        fontSize: '0.875rem',
-        borderTop: '1px solid rgba(255,255,255,0.05)'
-      }}>
+      <footer className="app-footer">
         <p>Viel Spaß beim Wichteln!</p>
-        <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', opacity: 0.7 }}>
+        <p className="footer-credits">
           Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity"
         </p>
       </footer>

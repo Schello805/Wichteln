@@ -128,6 +128,61 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                 </div>
 
+                <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Vorlagen</h3>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => onUpdateRules(diceCount === 1 ? DEFAULT_RULES_1_DIE : DEFAULT_RULES_2_DICE)}
+                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                        >
+                            Standard
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (diceCount === 1) {
+                                    onUpdateRules({
+                                        1: "Alle singen 'Jingle Bells'",
+                                        2: "Tausche mit Mama/Papa",
+                                        3: "Erzähle einen Witz",
+                                        4: "Mache 3 Hampelmänner",
+                                        5: "Umarme deinen Nachbarn",
+                                        6: "Joker! Such dir ein Geschenk aus"
+                                    });
+                                } else {
+                                    // Kids 2 dice logic placeholder
+                                    onUpdateRules(DEFAULT_RULES_2_DICE);
+                                }
+                            }}
+                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                        >
+                            Kinder
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (diceCount === 1) {
+                                    onUpdateRules({
+                                        1: "Alle tauschen nach links!",
+                                        2: "Alle tauschen nach rechts!",
+                                        3: "Tausche mit gegenüber",
+                                        4: "Alle Geschenke in die Mitte!",
+                                        5: "Würfel nochmal",
+                                        6: "Joker! Bestimme alles!"
+                                    });
+                                } else {
+                                    onUpdateRules(DEFAULT_RULES_2_DICE);
+                                }
+                            }}
+                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                        >
+                            Chaos
+                        </button>
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: '1rem', fontSize: '0.875rem', color: 'var(--secondary)', background: 'rgba(245, 158, 11, 0.1)', padding: '0.75rem', borderRadius: '8px' }}>
+                    💡 <strong>Tipp:</strong> Wenn du "(Joker)" oder "Joker" in den Regeltext schreibst, gibt es beim Würfeln einen Konfetti-Effekt! 🎉
+                </div>
+
                 <div style={{ marginBottom: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <label style={{ fontWeight: 600 }}>Regeln bearbeiten</label>

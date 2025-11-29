@@ -1,42 +1,118 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.app-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  background: var(--primary);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 15px var(--primary-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-title {
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.settings-btn {
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.settings-btn:hover {
+  color: var(--text-main);
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.dice-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.controls-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.roll-btn-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.roll-btn {
+  font-size: 1.25rem;
+  padding: 1rem 3rem;
+}
+
+.app-footer {
   text-align: center;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.footer-credits {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  opacity: 0.7;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Mobile Optimization */
+@media (max-width: 600px) {
+  .app-header {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .app-main {
+    gap: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .dice-container {
+    gap: 1rem;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .container {
+    padding: 1rem;
+  }
 
-.read-the-docs {
-  color: #888;
+  .roll-btn {
+    width: 100%;
+    padding: 1rem;
+  }
 }
