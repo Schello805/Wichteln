@@ -1,0 +1,97 @@
+.scene {
+    width: 200px;
+    height: 200px;
+    perspective: 600px;
+    margin: 0 auto;
+}
+
+.cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.cube__face {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border: 2px solid #e2e8f0;
+    border-radius: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+    backface-visibility: hidden;
+}
+
+.cube__face--1 {
+    transform: rotateY(0deg) translateZ(100px);
+}
+
+.cube__face--2 {
+    transform: rotateY(90deg) translateZ(100px);
+}
+
+.cube__face--3 {
+    transform: rotateY(180deg) translateZ(100px);
+}
+
+.cube__face--4 {
+    transform: rotateY(-90deg) translateZ(100px);
+}
+
+.cube__face--5 {
+    transform: rotateX(90deg) translateZ(100px);
+}
+
+.cube__face--6 {
+    transform: rotateX(-90deg) translateZ(100px);
+}
+
+.dot {
+    width: 36px;
+    height: 36px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Dot positioning grids */
+.face-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 140px;
+    height: 140px;
+    padding: 10px;
+}
+
+.dot-center {
+    grid-area: 2 / 2;
+}
+
+.dot-tl {
+    grid-area: 1 / 1;
+}
+
+.dot-tr {
+    grid-area: 1 / 3;
+}
+
+.dot-ml {
+    grid-area: 2 / 1;
+}
+
+.dot-mr {
+    grid-area: 2 / 3;
+}
+
+.dot-bl {
+    grid-area: 3 / 1;
+}
+
+.dot-br {
+    grid-area: 3 / 3;
+}
