@@ -50,6 +50,10 @@
   padding-bottom: 4rem;
 }
 
+.rotated {
+  transform: rotate(180deg);
+}
+
 .dice-container {
   position: relative;
   z-index: 10;

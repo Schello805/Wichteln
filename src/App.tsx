@@ -5,8 +5,9 @@ import Dice from './components/Dice';
 import RuleCard from './components/RuleCard';
 import Timer from './components/Timer';
 import SettingsModal from './components/SettingsModal';
-import { Gift, Settings, Sun, Moon } from 'lucide-react';
+import { Gift, Settings, Sun, Moon, RotateCw } from 'lucide-react';
 import Snow from './components/Snow';
+import './App.css';
 
 // Default rules for Schrottwichteln (1 Die)
 const DEFAULT_RULES_1_DIE: Record<number, string> = {
@@ -18,8 +19,6 @@ const DEFAULT_RULES_1_DIE: Record<number, string> = {
   6: "Joker! Tausche mit wem du willst (oder nicht)."
 };
 
-import './App.css';
-
 function App() {
   const [diceCount, setDiceCount] = useState<number>(1);
   const [rules, setRules] = useState<Record<number, string>>(DEFAULT_RULES_1_DIE);
@@ -27,6 +26,7 @@ function App() {
   const [isRolling, setIsRolling] = useState(false);
   const [showRule, setShowRule] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isRotated, setIsRotated] = useState(false);
 
   // Theme State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -87,7 +87,7 @@ function App() {
     const totalValue = diceValues.reduce((a, b) => a + b, 0);
     const currentRule = rules[totalValue] || "";
 
-    if (currentRule.includes("Joker")) { // Changed from "(Joker)" to "Joker" as per DEFAULT_RULES_1_DIE
+    if (currentRule.includes("Joker")) {
       confetti({
         particleCount: 150,
         spread: 70,
@@ -96,6 +96,36 @@ function App() {
       });
     }
   };
+
+  // Wake Lock
+  useEffect(() => {
+    let wakeLock: any = null;
+
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await (navigator as any).wakeLock.request('screen');
+        }
+      } catch (err) {
+        console.log('Wake Lock error:', err);
+      }
+    };
+
+    requestWakeLock();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (wakeLock) wakeLock.release();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <div className="app-container">
@@ -124,6 +154,15 @@ function App() {
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
+            onClick={() => setIsRotated(!isRotated)}
+            className="settings-btn"
+            aria-label="Ansicht drehen"
+            style={{ color: isRotated ? 'var(--primary)' : 'inherit' }}
+          >
+            <RotateCw size={20} />
+          </button>
+
+          <button
             onClick={toggleTheme}
             className="settings-btn"
             aria-label="Design wechseln"
@@ -141,8 +180,15 @@ function App() {
         </div>
       </header>
 
-      <main className="container app-main">
-        <div className="dice-container">
+      <main
+        className={`container app-main ${isRotated ? 'rotated' : ''}`}
+        style={{ transition: 'transform 0.5s ease' }}
+      >
+        <div
+          className="dice-container"
+          onClick={handleRoll}
+          style={{ cursor: 'pointer' }}
+        >
           {diceValues.map((val, idx) => (
             <Dice
               key={idx}
@@ -181,7 +227,7 @@ function App() {
       <footer className="app-footer">
         <p>Viel Spaß beim Wichteln!</p>
         <p className="footer-credits">
-          Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity"
+          Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.0.0
         </p>
       </footer>
     </div>
