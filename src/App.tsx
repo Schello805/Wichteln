@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { playRollSound, playWinSound } from './utils/audio';
-import Dice from './components/Dice';
-import RuleCard from './components/RuleCard';
-import Timer from './components/Timer';
 import SettingsModal from './components/SettingsModal';
-import { Gift, Settings, Sun, Moon, RotateCw } from 'lucide-react';
+import { Gift, Settings, Sun, Moon, RotateCw, Split } from 'lucide-react';
 import Snow from './components/Snow';
+import GameInterface from './components/GameInterface';
 import './App.css';
 
 // Default rules for Schrottwichteln (1 Die)
@@ -27,6 +25,11 @@ function App() {
   const [showRule, setShowRule] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isRotated, setIsRotated] = useState(false);
+  const [isSplitView, setIsSplitView] = useState(false);
+
+  // New Features
+  const [history, setHistory] = useState<number[]>([]);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
   // Theme State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -48,7 +51,7 @@ function App() {
   // Sound loop effect
   useEffect(() => {
     let interval: any;
-    if (isRolling) {
+    if (isRolling && isSoundEnabled) {
       interval = setInterval(() => {
         playRollSound();
       }, 100);
@@ -56,7 +59,7 @@ function App() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRolling]);
+  }, [isRolling, isSoundEnabled]);
 
   const totalValue = diceValues.reduce((a, b) => a + b, 0);
 
@@ -71,12 +74,48 @@ function App() {
     setDiceValues(newValues);
   };
 
-  const onRollComplete = () => {
+  const handleManualInput = (value: number) => {
+    if (isRolling) return;
+
+    // For manual input, we set the dice to match the sum if possible, or just random if it's complicated
+    // For 1 die, it's exact. For 2 dice, we try to find a pair.
+    let newValues: number[] = [];
+
+    if (diceCount === 1) {
+      newValues = [value];
+    } else {
+      // Find a random pair that sums to value
+      // Possible range for each die: 1-6
+      const possiblePairs: [number, number][] = [];
+      for (let i = 1; i <= 6; i++) {
+        const remainder = value - i;
+        if (remainder >= 1 && remainder <= 6) {
+          possiblePairs.push([i, remainder]);
+        }
+      }
+
+      if (possiblePairs.length > 0) {
+        const pair = possiblePairs[Math.floor(Math.random() * possiblePairs.length)];
+        newValues = pair;
+      } else {
+        // Fallback (should not happen if input is valid 2-12)
+        newValues = Array(diceCount).fill(1);
+      }
+    }
+
+    setDiceValues(newValues);
+    // Trigger completion logic immediately
+    onRollComplete(newValues);
+  };
+
+  const onRollComplete = (values: number[] = diceValues) => {
     setIsRolling(false);
     setShowRule(true);
 
     // Play win sound
-    playWinSound();
+    if (isSoundEnabled) {
+      playWinSound();
+    }
 
     // Haptic feedback
     if (navigator.vibrate) {
@@ -84,8 +123,11 @@ function App() {
     }
 
     // Check for Joker in rule text
-    const totalValue = diceValues.reduce((a, b) => a + b, 0);
-    const currentRule = rules[totalValue] || "";
+    const currentTotal = values.reduce((a, b) => a + b, 0);
+    const currentRule = rules[currentTotal] || "";
+
+    // Update History (keep last 5)
+    setHistory(prev => [currentTotal, ...prev].slice(0, 5));
 
     if (currentRule.includes("Joker")) {
       confetti({
@@ -127,6 +169,20 @@ function App() {
     };
   }, []);
 
+  const gameInterfaceProps = {
+    diceValues,
+    isRolling,
+    onRollComplete: () => onRollComplete(),
+    handleRoll,
+    rules,
+    totalValue,
+    showRule,
+    diceCount,
+    onManualInput: handleManualInput,
+    history,
+    onDismissRule: () => setShowRule(false)
+  };
+
   return (
     <div className="app-container">
       <Snow />
@@ -141,7 +197,10 @@ function App() {
           // Reset dice visuals when changing count
           setDiceValues(Array(count).fill(1));
           setShowRule(false);
+          setHistory([]); // Reset history on mode change
         }}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={() => setIsSoundEnabled(!isSoundEnabled)}
       />
 
       <header className="app-header">
@@ -154,13 +213,27 @@ function App() {
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
-            onClick={() => setIsRotated(!isRotated)}
+            onClick={() => {
+              setIsSplitView(!isSplitView);
+              setIsRotated(false); // Reset rotation when entering split view
+            }}
             className="settings-btn"
-            aria-label="Ansicht drehen"
-            style={{ color: isRotated ? 'var(--primary)' : 'inherit' }}
+            aria-label="Split Screen"
+            style={{ color: isSplitView ? 'var(--primary)' : 'inherit' }}
           >
-            <RotateCw size={20} />
+            <Split size={20} />
           </button>
+
+          {!isSplitView && (
+            <button
+              onClick={() => setIsRotated(!isRotated)}
+              className="settings-btn"
+              aria-label="Ansicht drehen"
+              style={{ color: isRotated ? 'var(--primary)' : 'inherit' }}
+            >
+              <RotateCw size={20} />
+            </button>
+          )}
 
           <button
             onClick={toggleTheme}
@@ -180,56 +253,32 @@ function App() {
         </div>
       </header>
 
-      <main
-        className={`container app-main ${isRotated ? 'rotated' : ''}`}
-        style={{ transition: 'transform 0.5s ease' }}
-      >
-        <div
-          className="dice-container"
-          onClick={handleRoll}
-          style={{ cursor: 'pointer' }}
-        >
-          {diceValues.map((val, idx) => (
-            <Dice
-              key={idx}
-              value={val}
-              isRolling={isRolling}
-              onRollComplete={idx === diceValues.length - 1 ? onRollComplete : undefined}
-            />
-          ))}
-        </div>
-
-        <div className="controls-container">
-          <div className="roll-btn-wrapper">
-            <button
-              className="btn-primary roll-btn"
-              onClick={handleRoll}
-              disabled={isRolling}
-              style={{
-                opacity: isRolling ? 0.8 : 1,
-                transform: isRolling ? 'scale(0.98)' : 'scale(1)'
-              }}
-            >
-              {isRolling ? 'Würfelt...' : 'Würfeln!'}
-            </button>
+      {isSplitView ? (
+        <main className="container app-main split-view">
+          <div className="split-section rotated">
+            <GameInterface {...gameInterfaceProps} />
           </div>
+          <div className="split-section">
+            <GameInterface {...gameInterfaceProps} />
+          </div>
+        </main>
+      ) : (
+        <main
+          className={`container app-main ${isRotated ? 'rotated' : ''}`}
+          style={{ transition: 'transform 0.5s ease' }}
+        >
+          <GameInterface {...gameInterfaceProps} />
+        </main>
+      )}
 
-          <RuleCard
-            rule={rules[totalValue] || "Keine Regel definiert"}
-            number={totalValue}
-            isVisible={showRule}
-          />
-
-          <Timer />
-        </div>
-      </main>
-
-      <footer className="app-footer">
-        <p>Viel Spaß beim Wichteln!</p>
-        <p className="footer-credits">
-          Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.0.0
-        </p>
-      </footer>
+      {!isSplitView && (
+        <footer className="app-footer">
+          <p>Viel Spaß beim Wichteln!</p>
+          <p className="footer-credits">
+            Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.0.0
+          </p>
+        </footer>
+      )}
     </div>
   );
 }

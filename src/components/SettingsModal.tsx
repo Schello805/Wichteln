@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Save, RotateCcw } from 'lucide-react';
+import { X, Save, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import './SettingsModal.css';
 
 interface SettingsModalProps {
@@ -9,6 +9,8 @@ interface SettingsModalProps {
     onUpdateRules: (newRules: Record<number, string>) => void;
     diceCount: number;
     onUpdateDiceCount: (count: number) => void;
+    isSoundEnabled: boolean;
+    onToggleSound: () => void;
 }
 
 const DEFAULT_RULES_1_DIE: Record<number, string> = {
@@ -29,9 +31,9 @@ const DEFAULT_RULES_2_DICE: Record<number, string> = {
     7: "Nichts passiert (Glück gehabt!)",
     8: "Alle geben ihr Geschenk nach links",
     9: "Tausche mit dem 3. Spieler zu deiner Rechten",
-    10: "Du musst ein Weihnachtslied singen",
+    10: "Tausche dein Geschenk mit dem Spieler gegenüber",
     11: "Tausche das Geschenk mit dem, der am weitesten weg sitzt",
-    12: "Joker! Bestimme eine Regel für diese Runde"
+    12: "Joker! Tausche ein Geschenk deiner Wahl"
 };
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -40,7 +42,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     rules,
     onUpdateRules,
     diceCount,
-    onUpdateDiceCount
+    onUpdateDiceCount,
+    isSoundEnabled,
+    onToggleSound
 }) => {
     if (!isOpen) return null;
 
@@ -95,6 +99,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 </h2>
 
                 <div style={{ marginBottom: '2rem' }}>
+                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Allgemein</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            <span>Soundeffekte</span>
+                        </div>
+                        <label className="switch">
+                            <input type="checkbox" checked={isSoundEnabled} onChange={onToggleSound} />
+                            <span className="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: '2rem' }}>
                     <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Anzahl Würfel</label>
                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                         <button
@@ -141,15 +159,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             onClick={() => {
                                 if (diceCount === 1) {
                                     onUpdateRules({
-                                        1: "Alle singen 'Jingle Bells'",
-                                        2: "Tausche mit Mama/Papa",
-                                        3: "Erzähle einen Witz",
-                                        4: "Mache 3 Hampelmänner",
-                                        5: "Umarme deinen Nachbarn",
+                                        1: "Geschenk auspacken",
+                                        2: "Tausche mit Mama oder Papa",
+                                        3: "Gib dein Geschenk nach rechts",
+                                        4: "Gib dein Geschenk nach links",
+                                        5: "Tausche mit einem Freund",
                                         6: "Joker! Such dir ein Geschenk aus"
                                     });
                                 } else {
-                                    // Kids 2 dice logic placeholder
                                     onUpdateRules(DEFAULT_RULES_2_DICE);
                                 }
                             }}
@@ -166,7 +183,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                         3: "Tausche mit gegenüber",
                                         4: "Alle Geschenke in die Mitte!",
                                         5: "Würfel nochmal",
-                                        6: "Joker! Bestimme alles!"
+                                        6: "Joker! Tausche zwei beliebige Geschenke!"
                                     });
                                 } else {
                                     onUpdateRules(DEFAULT_RULES_2_DICE);
@@ -175,6 +192,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
                         >
                             Chaos
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (diceCount === 1) {
+                                    onUpdateRules({
+                                        1: "Tausche mit dem, der am längsten da ist",
+                                        2: "Tausche mit dem Büro-Clown",
+                                        3: "Gib dein Geschenk an den 'Chef' der Runde",
+                                        4: "Tausche mit dem, der zuletzt Urlaub hatte",
+                                        5: "Alle Geschenke wandern ins 'Meeting' (Mitte)",
+                                        6: "Joker! Mach eine 'Management-Entscheidung' (Tausch)"
+                                    });
+                                } else {
+                                    onUpdateRules(DEFAULT_RULES_2_DICE);
+                                }
+                            }}
+                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                        >
+                            Kollegen
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (diceCount === 1) {
+                                    onUpdateRules({
+                                        1: "Tausche mit dem 'heißesten' Mitspieler",
+                                        2: "Gib dein Geschenk an jemanden mit schönen Augen",
+                                        3: "Tausche mit dem, der am unschuldigsten wirkt",
+                                        4: "Tausche mit dem, der das größte... Geschenk hat",
+                                        5: "Alle geben ihr Geschenk mit einem Kuss weiter",
+                                        6: "Joker! Tausche mit deinem Schwarm"
+                                    });
+                                } else {
+                                    onUpdateRules(DEFAULT_RULES_2_DICE);
+                                }
+                            }}
+                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                        >
+                            Anzüglich
                         </button>
                     </div>
                 </div>
