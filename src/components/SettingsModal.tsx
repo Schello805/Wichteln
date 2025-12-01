@@ -11,6 +11,9 @@ interface SettingsModalProps {
     onUpdateDiceCount: (count: number) => void;
     isSoundEnabled: boolean;
     onToggleSound: () => void;
+    gameMode: 'classic' | 'pig' | null;
+    isPigAdvanced?: boolean;
+    onTogglePigAdvanced?: () => void;
 }
 
 const DEFAULT_RULES_1_DIE: Record<number, string> = {
@@ -44,7 +47,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     diceCount,
     onUpdateDiceCount,
     isSoundEnabled,
-    onToggleSound
+    onToggleSound,
+    gameMode,
+    isPigAdvanced,
+    onTogglePigAdvanced
 }) => {
     if (!isOpen) return null;
 
@@ -100,139 +106,157 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 <div style={{ marginBottom: '2rem' }}>
                     <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Allgemein</label>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                            <span>Soundeffekte</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                                <span>Soundeffekte</span>
+                            </div>
+                            <label className="switch">
+                                <input type="checkbox" checked={isSoundEnabled} onChange={onToggleSound} />
+                                <span className="slider round"></span>
+                            </label>
                         </div>
-                        <label className="switch">
-                            <input type="checkbox" checked={isSoundEnabled} onChange={onToggleSound} />
-                            <span className="slider round"></span>
-                        </label>
+
+                        {gameMode === 'pig' && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span>Erweiterte Regeln (Tausch bei 3)</span>
+                                </div>
+                                <label className="switch">
+                                    <input type="checkbox" checked={isPigAdvanced} onChange={onTogglePigAdvanced} />
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Anzahl Würfel</label>
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                        <button
-                            className={diceCount === 1 ? 'btn-primary' : ''}
-                            style={{
-                                padding: '0.5rem 1.5rem',
-                                borderRadius: '8px',
-                                background: diceCount === 1 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                flex: 1,
-                                justifyContent: 'center'
-                            }}
-                            onClick={() => handleDiceCountChange(1)}
-                        >
-                            1 Würfel
-                        </button>
-                        <button
-                            className={diceCount === 2 ? 'btn-primary' : ''}
-                            style={{
-                                padding: '0.5rem 1.5rem',
-                                borderRadius: '8px',
-                                background: diceCount === 2 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                flex: 1,
-                                justifyContent: 'center'
-                            }}
-                            onClick={() => handleDiceCountChange(2)}
-                        >
-                            2 Würfel
-                        </button>
-                    </div>
-                </div>
+                {gameMode !== 'pig' && (
+                    <>
+                        <div style={{ marginBottom: '2rem' }}>
+                            <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 600 }}>Anzahl Würfel</label>
+                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                <button
+                                    className={diceCount === 1 ? 'btn-primary' : ''}
+                                    style={{
+                                        padding: '0.5rem 1.5rem',
+                                        borderRadius: '8px',
+                                        background: diceCount === 1 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        flex: 1,
+                                        justifyContent: 'center'
+                                    }}
+                                    onClick={() => handleDiceCountChange(1)}
+                                >
+                                    1 Würfel
+                                </button>
+                                <button
+                                    className={diceCount === 2 ? 'btn-primary' : ''}
+                                    style={{
+                                        padding: '0.5rem 1.5rem',
+                                        borderRadius: '8px',
+                                        background: diceCount === 2 ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        flex: 1,
+                                        justifyContent: 'center'
+                                    }}
+                                    onClick={() => handleDiceCountChange(2)}
+                                >
+                                    2 Würfel
+                                </button>
+                            </div>
+                        </div>
 
-                <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                    <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Vorlagen</h3>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <button
-                            onClick={() => onUpdateRules(diceCount === 1 ? DEFAULT_RULES_1_DIE : DEFAULT_RULES_2_DICE)}
-                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            Standard
-                        </button>
-                        <button
-                            onClick={() => {
-                                if (diceCount === 1) {
-                                    onUpdateRules({
-                                        1: "Geschenk auspacken",
-                                        2: "Tausche mit Mama oder Papa",
-                                        3: "Gib dein Geschenk nach rechts",
-                                        4: "Gib dein Geschenk nach links",
-                                        5: "Tausche mit einem Freund",
-                                        6: "Joker! Such dir ein Geschenk aus"
-                                    });
-                                } else {
-                                    onUpdateRules(DEFAULT_RULES_2_DICE);
-                                }
-                            }}
-                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            Kinder
-                        </button>
-                        <button
-                            onClick={() => {
-                                if (diceCount === 1) {
-                                    onUpdateRules({
-                                        1: "Alle tauschen nach links!",
-                                        2: "Alle tauschen nach rechts!",
-                                        3: "Tausche mit gegenüber",
-                                        4: "Alle Geschenke in die Mitte!",
-                                        5: "Würfel nochmal",
-                                        6: "Joker! Tausche zwei beliebige Geschenke!"
-                                    });
-                                } else {
-                                    onUpdateRules(DEFAULT_RULES_2_DICE);
-                                }
-                            }}
-                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            Chaos
-                        </button>
-                        <button
-                            onClick={() => {
-                                if (diceCount === 1) {
-                                    onUpdateRules({
-                                        1: "Tausche mit dem, der am längsten da ist",
-                                        2: "Tausche mit dem Büro-Clown",
-                                        3: "Gib dein Geschenk an den 'Chef' der Runde",
-                                        4: "Tausche mit dem, der zuletzt Urlaub hatte",
-                                        5: "Alle Geschenke wandern ins 'Meeting' (Mitte)",
-                                        6: "Joker! Mach eine 'Management-Entscheidung' (Tausch)"
-                                    });
-                                } else {
-                                    onUpdateRules(DEFAULT_RULES_2_DICE);
-                                }
-                            }}
-                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            Kollegen
-                        </button>
-                        <button
-                            onClick={() => {
-                                if (diceCount === 1) {
-                                    onUpdateRules({
-                                        1: "Tausche mit dem 'heißesten' Mitspieler",
-                                        2: "Gib dein Geschenk an jemanden mit schönen Augen",
-                                        3: "Tausche mit dem, der am unschuldigsten wirkt",
-                                        4: "Tausche mit dem, der das größte... Geschenk hat",
-                                        5: "Alle geben ihr Geschenk mit einem Kuss weiter",
-                                        6: "Joker! Tausche mit deinem Schwarm"
-                                    });
-                                } else {
-                                    onUpdateRules(DEFAULT_RULES_2_DICE);
-                                }
-                            }}
-                            style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            Anzüglich
-                        </button>
-                    </div>
-                </div>
+                        <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                            <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Vorlagen</h3>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button
+                                    onClick={() => onUpdateRules(diceCount === 1 ? DEFAULT_RULES_1_DIE : DEFAULT_RULES_2_DICE)}
+                                    style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    Standard
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (diceCount === 1) {
+                                            onUpdateRules({
+                                                1: "Geschenk auspacken",
+                                                2: "Tausche mit Mama oder Papa",
+                                                3: "Gib dein Geschenk nach rechts",
+                                                4: "Gib dein Geschenk nach links",
+                                                5: "Tausche mit einem Freund",
+                                                6: "Joker! Such dir ein Geschenk aus"
+                                            });
+                                        } else {
+                                            onUpdateRules(DEFAULT_RULES_2_DICE);
+                                        }
+                                    }}
+                                    style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    Kinder
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (diceCount === 1) {
+                                            onUpdateRules({
+                                                1: "Alle tauschen nach links!",
+                                                2: "Alle tauschen nach rechts!",
+                                                3: "Tausche mit gegenüber",
+                                                4: "Alle Geschenke in die Mitte!",
+                                                5: "Würfel nochmal",
+                                                6: "Joker! Tausche zwei beliebige Geschenke!"
+                                            });
+                                        } else {
+                                            onUpdateRules(DEFAULT_RULES_2_DICE);
+                                        }
+                                    }}
+                                    style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    Chaos
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (diceCount === 1) {
+                                            onUpdateRules({
+                                                1: "Tausche mit dem, der am längsten da ist",
+                                                2: "Tausche mit dem Büro-Clown",
+                                                3: "Gib dein Geschenk an den 'Chef' der Runde",
+                                                4: "Tausche mit dem, der zuletzt Urlaub hatte",
+                                                5: "Alle Geschenke wandern ins 'Meeting' (Mitte)",
+                                                6: "Joker! Mach eine 'Management-Entscheidung' (Tausch)"
+                                            });
+                                        } else {
+                                            onUpdateRules(DEFAULT_RULES_2_DICE);
+                                        }
+                                    }}
+                                    style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    Kollegen
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (diceCount === 1) {
+                                            onUpdateRules({
+                                                1: "Tausche mit dem 'heißesten' Mitspieler",
+                                                2: "Gib dein Geschenk an jemanden mit schönen Augen",
+                                                3: "Tausche mit dem, der am unschuldigsten wirkt",
+                                                4: "Tausche mit dem, der das größte... Geschenk hat",
+                                                5: "Alle geben ihr Geschenk mit einem Kompliment weiter",
+                                                6: "Joker! Tausche mit deinem Lieblingsmenschen"
+                                            });
+                                        } else {
+                                            onUpdateRules(DEFAULT_RULES_2_DICE);
+                                        }
+                                    }}
+                                    style={{ padding: '0.5rem', borderRadius: '6px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                                >
+                                    Anzüglich
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 <div style={{ marginBottom: '1rem', fontSize: '0.875rem', color: 'var(--secondary)', background: 'rgba(245, 158, 11, 0.1)', padding: '0.75rem', borderRadius: '8px' }}>
                     💡 <strong>Tipp:</strong> Wenn du "(Joker)" oder "Joker" in den Regeltext schreibst, gibt es beim Würfeln einen Konfetti-Effekt! 🎉

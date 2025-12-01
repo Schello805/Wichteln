@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { playRollSound, playWinSound } from './utils/audio';
 import SettingsModal from './components/SettingsModal';
-import { Gift, Settings, Sun, Moon, RotateCw, Split } from 'lucide-react';
+import StartScreen from './components/StartScreen';
+import PrintableNumbers from './components/PrintableNumbers';
+import { Gift, Settings, Sun, Moon, RotateCw, Split, ArrowLeft, Github } from 'lucide-react';
 import Snow from './components/Snow';
 import GameInterface from './components/GameInterface';
 import './App.css';
@@ -17,7 +19,27 @@ const DEFAULT_RULES_1_DIE: Record<number, string> = {
   6: "Joker! Tausche mit wem du willst (oder nicht)."
 };
 
+// Rules for Schweinchen töten
+const PIG_RULES: Record<number, string> = {
+  1: "Nichts passiert. Weitergeben.",
+  2: "Nichts passiert. Weitergeben.",
+  3: "Nichts passiert. Weitergeben.", // Can be swapped in advanced mode
+  4: "Nichts passiert. Weitergeben.",
+  5: "Nichts passiert. Weitergeben.",
+  6: "Nimm das nächste Teil aus der Schnecke! (Geschenk sofort auspacken)"
+};
+
+const PIG_RULES_ADVANCED: Record<number, string> = {
+  ...PIG_RULES,
+  3: "Tausche ein Geschenk deiner Wahl!"
+};
+
+type GameMode = 'classic' | 'pig' | null;
+
 function App() {
+  const [gameMode, setGameMode] = useState<GameMode>(null);
+  const [showPrintables, setShowPrintables] = useState(false);
+
   const [diceCount, setDiceCount] = useState<number>(1);
   const [rules, setRules] = useState<Record<number, string>>(DEFAULT_RULES_1_DIE);
   const [diceValues, setDiceValues] = useState<number[]>([1]);
@@ -129,7 +151,7 @@ function App() {
     // Update History (keep last 5)
     setHistory(prev => [currentTotal, ...prev].slice(0, 5));
 
-    if (currentRule.includes("Joker")) {
+    if (currentRule.includes("Joker") || (gameMode === 'pig' && currentTotal === 6)) {
       confetti({
         particleCount: 150,
         spread: 70,
@@ -169,6 +191,27 @@ function App() {
     };
   }, []);
 
+  const [isPigAdvanced, setIsPigAdvanced] = useState(false);
+
+  const handleModeSelect = (mode: 'classic' | 'pig') => {
+    setGameMode(mode);
+    setHistory([]);
+    if (mode === 'pig') {
+      setDiceCount(1);
+      setRules(isPigAdvanced ? PIG_RULES_ADVANCED : PIG_RULES);
+    } else {
+      setDiceCount(1);
+      setRules(DEFAULT_RULES_1_DIE);
+    }
+  };
+
+  // Update rules when advanced toggle changes
+  useEffect(() => {
+    if (gameMode === 'pig') {
+      setRules(isPigAdvanced ? PIG_RULES_ADVANCED : PIG_RULES);
+    }
+  }, [isPigAdvanced, gameMode]);
+
   const gameInterfaceProps = {
     diceValues,
     isRolling,
@@ -182,6 +225,85 @@ function App() {
     history,
     onDismissRule: () => setShowRule(false)
   };
+
+  const Footer = () => (
+    <footer className="app-footer">
+      <div className="footer-content">
+        <p>Viel Spaß beim Wichteln!</p>
+
+        <div className="footer-links" style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <a
+            href="https://github.com/Schello805/Wichteln"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            <Github size={16} />
+            <span>Open Source</span>
+          </a>
+          <span style={{ opacity: 0.5 }}>•</span>
+          <span style={{ opacity: 0.8 }}>Mit KI erstellt</span>
+        </div>
+
+        <div className="legal-info" style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem' }}>
+          <p style={{ margin: '0.25rem 0' }}>
+            <strong>Impressum:</strong> Michael Schellenberger, <a href="mailto:info@schellenberger.biz" style={{ color: 'inherit' }}>info@schellenberger.biz</a>
+          </p>
+          <p style={{ margin: '0.25rem 0' }}>
+            <a href="/DATENSCHUTZ.md" target="_blank" style={{ color: 'inherit', textDecoration: 'underline' }}>Datenschutzerklärung</a>
+          </p>
+        </div>
+
+        <p className="footer-credits" style={{ fontSize: '0.75rem', opacity: 0.5 }}>
+          v1.1.0 • © {new Date().getFullYear()} M. Schellenberger
+        </p>
+      </div>
+    </footer>
+  );
+
+  if (showPrintables) {
+    return <PrintableNumbers onClose={() => setShowPrintables(false)} />;
+  }
+
+  if (!gameMode) {
+    return (
+      <div className="app-container">
+        <Snow />
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          rules={rules}
+          onUpdateRules={setRules}
+          diceCount={diceCount}
+          onUpdateDiceCount={(count) => {
+            setDiceCount(count);
+            // Reset dice visuals when changing count
+            setDiceValues(Array(count).fill(1));
+            setShowRule(false);
+            setHistory([]); // Reset history on mode change
+            if (gameMode === 'pig') {
+              setRules(isPigAdvanced ? PIG_RULES_ADVANCED : PIG_RULES);
+            } else {
+              setRules(DEFAULT_RULES_1_DIE);
+            }
+          }}
+          isSoundEnabled={isSoundEnabled}
+          onToggleSound={() => setIsSoundEnabled(!isSoundEnabled)}
+          gameMode={gameMode}
+          isPigAdvanced={isPigAdvanced}
+          onTogglePigAdvanced={() => setIsPigAdvanced(!isPigAdvanced)}
+        />
+        <StartScreen
+          onSelectMode={handleModeSelect}
+          onOpenPrintables={() => setShowPrintables(true)}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
@@ -198,17 +320,28 @@ function App() {
           setDiceValues(Array(count).fill(1));
           setShowRule(false);
           setHistory([]); // Reset history on mode change
+          if (gameMode === 'pig') {
+            setRules(isPigAdvanced ? PIG_RULES_ADVANCED : PIG_RULES);
+          } else {
+            setRules(DEFAULT_RULES_1_DIE);
+          }
         }}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={() => setIsSoundEnabled(!isSoundEnabled)}
+        gameMode={gameMode}
+        isPigAdvanced={isPigAdvanced}
+        onTogglePigAdvanced={() => setIsPigAdvanced(!isPigAdvanced)}
       />
 
       <header className="app-header">
-        <div className="header-logo">
+        <div className="header-logo" onClick={() => setGameMode(null)} style={{ cursor: 'pointer' }}>
+          <ArrowLeft size={24} style={{ marginRight: '0.5rem' }} />
           <div className="logo-icon">
             <Gift color="white" size={24} />
           </div>
-          <h1 className="header-title">Wichtelhelfer</h1>
+          <h1 className="header-title">
+            {gameMode === 'pig' ? 'Schweinchen töten' : 'Wichtelhelfer'}
+          </h1>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -269,15 +402,6 @@ function App() {
         >
           <GameInterface {...gameInterfaceProps} />
         </main>
-      )}
-
-      {!isSplitView && (
-        <footer className="app-footer">
-          <p>Viel Spaß beim Wichteln!</p>
-          <p className="footer-credits">
-            Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.1.0
-          </p>
-        </footer>
       )}
     </div>
   );

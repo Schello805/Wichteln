@@ -143,9 +143,18 @@ sudo systemctl restart nginx
 
 Damit die PWA-Funktionen (Service Worker, Installation auf Handy) funktionieren, **MUSS** die Seite über **HTTPS** ausgeliefert werden. Nutze dafür z.B. Let's Encrypt (`certbot`).
 
-## Datenschutz
+## Rechtliches
 
+**Impressum:**  
+Michael Schellenberger  
+info@schellenberger.biz
+
+**Datenschutz:**  
 Siehe [DATENSCHUTZ.md](DATENSCHUTZ.md).
+
+**Hinweis:**  
+Dieses Projekt ist Open Source und wurde mit Unterstützung von KI erstellt.  
+Quellcode: [https://github.com/Schello805/Wichteln](https://github.com/Schello805/Wichteln)
 
 ## Lizenz
 
