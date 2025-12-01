@@ -255,7 +255,7 @@ function App() {
         </div>
 
         <p className="footer-credits" style={{ fontSize: '0.75rem', opacity: 0.5 }}>
-          v1.1.0 • © {new Date().getFullYear()} M. Schellenberger
+          v1.2.0 • © {new Date().getFullYear()} M. Schellenberger
         </p>
       </div>
     </footer>

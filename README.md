@@ -67,14 +67,14 @@ cd Wichteln
 
 ### 3. Installation & Build
 
-Du kannst das beiliegende `install.sh` Skript verwenden, um die Installation und zukünftige Updates zu vereinfachen.
+Du kannst das beiliegende `update.sh` Skript verwenden, um die Installation und zukünftige Updates zu vereinfachen.
 
 ```bash
 # Skript ausführbar machen
-chmod +x install.sh
+chmod +x update.sh
 
 # Installation starten
-./install.sh
+./update.sh
 ```
 
 Das Skript führt automatisch `npm install` und `npm run build` aus. Der fertige Build liegt dann im Ordner `dist`.
