@@ -53,8 +53,11 @@
 .app-main.split-view {
   flex-direction: column;
   padding: 0;
-  gap: 0;
-  justify-content: stretch;
+  gap: 1.5rem;
+  /* Increased gap */
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  /* Darker background for gap */
 }
 
 .split-section {
@@ -65,8 +68,51 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  overflow-y: auto;
+  overflow-y: hidden;
+  /* Prevent scrolling, keep compact */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--background);
+  /* Ensure sections have background */
+  border-radius: 16px;
+  /* Rounded corners for sections */
+}
+
+/* ... existing styles ... */
+
+.game-interface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  position: relative;
+  perspective: 1000px;
+  /* Enable 3D space */
+  transform-style: preserve-3d;
+  /* Maintain 3D relationships */
+}
+
+/* Rule Overlay */
+.rule-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.9);
+  /* Slightly more opaque */
+  backdrop-filter: blur(12px);
+  /* Stronger blur */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  /* High z-index */
+  border-radius: 24px;
+  animation: fadeIn 0.3s ease-out;
+  cursor: pointer;
+  transform: translateZ(200px);
+  /* Move overlay in front of dice */
 }
 
 .split-section.rotated {
@@ -276,6 +322,8 @@
   width: 100%;
   position: relative;
 }
+
+/* Clean up duplicates */
 
 .dice-section {
   display: flex;
