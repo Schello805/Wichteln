@@ -275,7 +275,7 @@ function App() {
         <footer className="app-footer">
           <p>Viel Spaß beim Wichteln!</p>
           <p className="footer-credits">
-            Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.0.0
+            Erstellt von M. Schellenberger am 29.11.25 mit "Antigravity" • v1.1.0
           </p>
         </footer>
       )}

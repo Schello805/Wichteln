@@ -5,9 +5,12 @@ Eine moderne Web-App für das beliebte Schrottwichteln-Spiel.
 ## Funktionen
 
 - **Virtuelle Würfel**: Ein oder mehrere Würfel können geworfen werden.
-- **Regelanzeige**: Automatische Anzeige der Regel basierend auf dem Wurfergebnis.
+- **Regelanzeige**: Automatische Anzeige der Regel basierend auf dem Wurfergebnis (jetzt als Overlay!).
 - **Timer**: Ein integrierter Timer für zeitbegrenzte Runden.
-- **Einstellungen**: Anpassbare Regeln und Anzahl der Würfel.
+- **Einstellungen**: Anpassbare Regeln, Anzahl der Würfel und Sound-Optionen.
+- **Table-Mode**: Split-Screen und Rotation für das Spielen am Tisch.
+- **Manuelle Eingabe**: Falls echte Würfel verwendet werden sollen.
+- **Verlauf**: Anzeige der letzten Würfe.
 - **Responsive Design**: Funktioniert auf Desktop und Mobile.
 - **PWA**: Installierbar als App auf dem Smartphone.
 - **Spaßfaktoren**: Soundeffekte, Vibration und Konfetti bei Jokern!
